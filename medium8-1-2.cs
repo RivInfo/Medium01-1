@@ -1,89 +1,100 @@
 using System;
-using System.Collections.Generic;
 
 namespace Task
 {
     class Program
     {
-        public static void Main(string[] args)
+        public static void Main()
         {
-            int obj1x = 5;
-            int obj1y = 5;
-            bool isalive1 = true;
-            int obj2x = 10;
-            int obj2y = 10;
-            bool isalive2 = true;
-            int obj3x = 15;
-            int obj3y = 15;
-            bool isalive3 = true;
+            Trajectory obg1 = new Trajectory(5, 5, true);
+            Trajectory obg2 = new Trajectory(10, 10, true);
+            Trajectory obg3 = new Trajectory(15, 15, true);
 
             Random random = new Random();
 
             while (true)
             {
-                if (obj1x == obj2x && obj1y == obj2y)
+                if (obg1.EqualsTrajectory(obg2))
                 {
-                    isalive1 = false;
-                    isalive2 = false;
+                    obg1.Isalive = false;
+                    obg2.Isalive = false;
                 }
 
-                if (obj1x == obj3x && obj1y == obj3y)
+                if (obg1.EqualsTrajectory(obg3))
                 {
-                    isalive1 = false;
-                    isalive3 = false;
+                    obg1.Isalive = false;
+                    obg3.Isalive = false;
                 }
 
-                if (obj2x == obj3x && obj2y == obj3y)
+                if (obg2.EqualsTrajectory(obg3))
                 {
-                    isalive2 = false;
-                    isalive3 = false;
+                    obg2.Isalive = false;
+                    obg3.Isalive = false;
                 }
 
-                obj1x += random.Next(-1, 1);
-                obj1y += random.Next(-1, 1);
+                obg1.PlusStep(random.Next(-1, 1), random.Next(-1, 1));
+                obg2.PlusStep(random.Next(-1, 1), random.Next(-1, 1));
+                obg3.PlusStep(random.Next(-1, 1), random.Next(-1, 1));
 
-                obj2x += random.Next(-1, 1);
-                obj2y += random.Next(-1, 1);
+                obg1.PositivePosition();
+                obg2.PositivePosition();
+                obg3.PositivePosition();
 
-                obj3x += random.Next(-1, 1);
-                obj3y += random.Next(-1, 1);
-
-                if (obj1x < 0)
-                    obj1x = 0;
-
-                if (obj1y < 0)
-                    obj1y = 0;
-
-                if (obj2x < 0)
-                    obj2x = 0;
-
-                if (obj2y < 0)
-                    obj2y = 0;
-
-                if (obj3x < 0)
-                    obj3x = 0;
-
-                if (obj3y < 0)
-                    obj3y = 0;
-
-                if (isalive1)
+                if (obg1.Isalive)
                 {
-                    Console.SetCursorPosition(obj1x, obj1y);
+                    Console.SetCursorPosition(obg1.X, obg1.Y);
                     Console.Write("1");
                 }
 
-                if (isalive2)
+                if (obg2.Isalive)
                 {
-                    Console.SetCursorPosition(obj2x, obj2y);
+                    Console.SetCursorPosition(obg2.X, obg2.Y);
                     Console.Write("2");
                 }
 
-                if (isalive3)
+                if (obg3.Isalive)
                 {
-                    Console.SetCursorPosition(obj3x, obj3y);
+                    Console.SetCursorPosition(obg3.X, obg3.Y);
                     Console.Write("3");
                 }
             }
+        }
+    }
+
+    class Trajectory
+    {
+        public int X { get; private set; }
+        public int Y { get; private set; }
+        public bool Isalive { get; set; }
+
+        public Trajectory(int x, int y, bool isalive)
+        {
+            X = x;
+            Y = y;
+            Isalive = isalive;
+        }
+
+        public void PlusStep(int stepx, int stepy)
+        {
+            X += stepx;
+            Y += stepy;
+        }
+
+        public void PositivePosition()
+        {
+            if (X < 0)
+                X = 0;
+
+            if (Y < 0)
+                Y = 0;
+        }
+
+        public bool EqualsTrajectory(Trajectory other)
+        {
+            if (X == other.X && Y == other.Y)
+                return true;
+            else
+                return false;
         }
     }
 }
