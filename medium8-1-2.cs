@@ -6,81 +6,81 @@ namespace Task
     {
         public static void Main()
         {
-            Trajectory obg1 = new Trajectory(5, 5, true);
-            Trajectory obg2 = new Trajectory(10, 10, true);
-            Trajectory obg3 = new Trajectory(15, 15, true);
+            Trajectory obg1 = new Trajectory(new Position(5,5), true);
+            Trajectory obg2 = new Trajectory(new Position(10, 10), true);
+            Trajectory obg3 = new Trajectory(new Position(15, 15), true);
+
+            Position _obg1Pos = obg1.Position;
+            Position _obg2Pos = obg2.Position;
+            Position _obg3Pos = obg3.Position;
 
             Random random = new Random();
 
             while (true)
             {
-                if (obg1.EqualsTrajectory(obg2))
+                if (_obg1Pos.EqualsPosition(_obg2Pos))
                 {
                     obg1.Isalive = false;
                     obg2.Isalive = false;
                 }
 
-                if (obg1.EqualsTrajectory(obg3))
+                if (_obg1Pos.EqualsPosition(_obg3Pos))
                 {
                     obg1.Isalive = false;
                     obg3.Isalive = false;
                 }
 
-                if (obg2.EqualsTrajectory(obg3))
+                if (_obg2Pos.EqualsPosition(_obg3Pos))
                 {
                     obg2.Isalive = false;
                     obg3.Isalive = false;
                 }
 
-                obg1.PlusStep(random.Next(-1, 1), random.Next(-1, 1));
-                obg2.PlusStep(random.Next(-1, 1), random.Next(-1, 1));
-                obg3.PlusStep(random.Next(-1, 1), random.Next(-1, 1));
-
-                obg1.PositivePosition();
-                obg2.PositivePosition();
-                obg3.PositivePosition();
+                _obg1Pos.PlusAndPositiv(random.Next(-1, 1), random.Next(-1, 1));
+                _obg2Pos.PlusAndPositiv(random.Next(-1, 1), random.Next(-1, 1));
+                _obg3Pos.PlusAndPositiv(random.Next(-1, 1), random.Next(-1, 1));
 
                 if (obg1.Isalive)
                 {
-                    Console.SetCursorPosition(obg1.X, obg1.Y);
-                    Console.Write("1");
+                    obg1.SetCursor("1");
                 }
 
                 if (obg2.Isalive)
                 {
-                    Console.SetCursorPosition(obg2.X, obg2.Y);
-                    Console.Write("2");
+                    obg2.SetCursor("2");
                 }
 
                 if (obg3.Isalive)
                 {
-                    Console.SetCursorPosition(obg3.X, obg3.Y);
-                    Console.Write("3");
+                    obg3.SetCursor("3");
                 }
             }
         }
     }
 
-    class Trajectory
+    class Position
     {
         public int X { get; private set; }
         public int Y { get; private set; }
-        public bool Isalive { get; set; }
 
-        public Trajectory(int x, int y, bool isalive)
+        public Position(int x, int y)
         {
             X = x;
             Y = y;
-            Isalive = isalive;
+        }
+        public void PlusAndPositiv(int stepx, int stepy)
+        {
+            PlusStep(stepx, stepy);
+            PositivePosition();
         }
 
-        public void PlusStep(int stepx, int stepy)
+        private void PlusStep(int stepx, int stepy)
         {
             X += stepx;
             Y += stepy;
         }
 
-        public void PositivePosition()
+        private void PositivePosition()
         {
             if (X < 0)
                 X = 0;
@@ -89,12 +89,30 @@ namespace Task
                 Y = 0;
         }
 
-        public bool EqualsTrajectory(Trajectory other)
+        public bool EqualsPosition(Position other)
         {
             if (X == other.X && Y == other.Y)
                 return true;
             else
                 return false;
+        }
+    }
+
+    class Trajectory
+    {
+        public Position Position { get; private set; }
+        public bool Isalive { get; set; }
+
+        public Trajectory(Position pos, bool isalive)
+        {
+            Position = pos;
+            Isalive = isalive;
+        }
+
+        public void SetCursor(string Num)
+        {
+            Console.SetCursorPosition(Position.X, Position.Y);
+            Console.Write(Num);
         }
     }
 }
