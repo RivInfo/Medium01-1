@@ -8,28 +8,42 @@ namespace Task
         {
             Random random = new Random();
 
-            Trajectory obg1 = new Trajectory(5, 5, random, true, "1");
-            Trajectory obg2 = new Trajectory(10, 10, random, true, "2");
-            Trajectory obg3 = new Trajectory(15, 15, random, true, "3");
+            RandomPath[] objs = new RandomPath[] 
+            { 
+                new RandomPath(5, 5, random, "1"),
+                new RandomPath(10, 10, random, "2"),
+                new RandomPath(15, 15, random, "3")
+            };
 
             while (true)
             {
-                obg1.EqualsPosition(obg2);
-                obg1.EqualsPosition(obg3);
-                obg2.EqualsPosition(obg3);
+                for (int i = 0; i < objs.Length - 1; i++)
+                {
+                    for (int j = i + 1; j < objs.Length; j++)
+                    {
+                        if (objs[i].EqualsPosition(objs[j]))
+                        {
+                            objs[i].Die();
+                            objs[j].Die();
+                        }
+                    }
+                }
 
-                obg1.RandomStepPositionAndPositiv();
-                obg2.RandomStepPositionAndPositiv();
-                obg3.RandomStepPositionAndPositiv();
-
-                obg1.WriteAliveTextInPosition();
-                obg2.WriteAliveTextInPosition();
-                obg3.WriteAliveTextInPosition();
+                foreach (var o in objs)
+                {
+                    o.RandomStepPosition();
+                    o.MinPositionValue();
+                    if (o.IsAlive)
+                    {
+                        Console.SetCursorPosition(o.X, o.Y);
+                        Console.Write(o.Text);
+                    }
+                }
             }
         }
     }
 
-    class Trajectory
+    class RandomPath
     {
         public int X { get; private set; }
         public int Y { get; private set; }
@@ -38,7 +52,7 @@ namespace Task
 
         private Random _random;
 
-        public Trajectory(int x, int y, Random random, bool isAlive, string text)
+        public RandomPath(int x, int y, Random random, string text, bool isAlive = true)
         {
             X = x;
             Y = y;
@@ -47,13 +61,12 @@ namespace Task
             Text = text;
         }
 
-        public void EqualsPosition(Trajectory trajectory)
+        public bool EqualsPosition(RandomPath position)
         {
-            if (trajectory.X == X && trajectory.Y == Y)
-            {
-                trajectory.Die();
-                Die();
-            }
+            if (position.X == X && position.Y == Y)
+                return true;
+            else
+                return false;
         }
 
         public void Die()
@@ -61,23 +74,18 @@ namespace Task
             IsAlive = false;
         }
 
-        public void RandomStepPositionAndPositiv()
+        public void RandomStepPosition()
         {
             X += _random.Next(-1, 1);
             Y += _random.Next(-1, 1);
+        }
+
+        public void MinPositionValue()
+        {
             if (X < 0)
                 X = 0;
             if (Y < 0)
                 Y = 0;
-        }
-
-        public void WriteAliveTextInPosition()
-        {
-            if (IsAlive)
-            {
-                Console.SetCursorPosition(X, Y);
-                Console.Write(Text);
-            }
         }
     }
 }
