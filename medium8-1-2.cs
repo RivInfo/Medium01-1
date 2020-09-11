@@ -8,11 +8,11 @@ namespace Task
         {
             Random random = new Random();
 
-            RandomPath[] objs = new RandomPath[] 
+            MoveableObject[] objs = new MoveableObject[] 
             { 
-                new RandomPath(5, 5, random, "1"),
-                new RandomPath(10, 10, random, "2"),
-                new RandomPath(15, 15, random, "3")
+                new MoveableObject(5, 5, random, "1"),
+                new MoveableObject(10, 10, random, "2"),
+                new MoveableObject(15, 15, random, "3")
             };
 
             while (true)
@@ -31,8 +31,8 @@ namespace Task
 
                 foreach (var o in objs)
                 {
-                    o.RandomStepPosition();
-                    o.MinPositionValue();
+                    o.RandomStepAssignment();
+                    o.LimitPosition();
                     if (o.IsAlive)
                     {
                         Console.SetCursorPosition(o.X, o.Y);
@@ -43,7 +43,7 @@ namespace Task
         }
     }
 
-    class RandomPath
+    class MoveableObject
     {
         public int X { get; private set; }
         public int Y { get; private set; }
@@ -52,7 +52,7 @@ namespace Task
 
         private Random _random;
 
-        public RandomPath(int x, int y, Random random, string text, bool isAlive = true)
+        public MoveableObject(int x, int y, Random random, string text, bool isAlive = true)
         {
             X = x;
             Y = y;
@@ -61,7 +61,7 @@ namespace Task
             Text = text;
         }
 
-        public bool EqualsPosition(RandomPath position)
+        public bool EqualsPosition(MoveableObject position)
         {
             if (position.X == X && position.Y == Y)
                 return true;
@@ -74,13 +74,13 @@ namespace Task
             IsAlive = false;
         }
 
-        public void RandomStepPosition()
+        public void RandomStepAssignment()
         {
             X += _random.Next(-1, 1);
             Y += _random.Next(-1, 1);
         }
 
-        public void MinPositionValue()
+        public void LimitPosition()
         {
             if (X < 0)
                 X = 0;
