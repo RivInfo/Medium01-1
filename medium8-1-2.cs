@@ -8,84 +8,114 @@ namespace Task
         {
             Random random = new Random();
 
-            MoveableObject[] objs = new MoveableObject[] 
-            { 
-                new MoveableObject(5, 5, random, "1"),
-                new MoveableObject(10, 10, random, "2"),
-                new MoveableObject(15, 15, random, "3")
+            GameObject[] objs = new GameObject[]
+            {
+                new GameObject(new Position(5, 5), new Renderer(true, "1")),
+                new GameObject(new Position(10, 10), new Renderer(true, "2")),
+                new GameObject(new Position(15, 15), new Renderer(true, "3"))
             };
 
             while (true)
             {
-                for (int i = 0; i < objs.Length - 1; i++)
-                {
-                    for (int j = i + 1; j < objs.Length; j++)
-                    {
-                        if (objs[i].EqualsPosition(objs[j]))
-                        {
-                            objs[i].Die();
-                            objs[j].Die();
-                        }
-                    }
-                }
+                if (objs.Length >= 2)
+                    for (int i = 0; i < objs.Length - 1; i++)
+                        for (int j = i + 1; j < objs.Length; j++)
+                            if (objs[i].Position.IntersectPosition(objs[j].Position))
+                            {
+                                objs[i].Render.Eneble = false;
+                                objs[j].Render.Eneble = false;
+                            }
 
                 foreach (var o in objs)
                 {
-                    o.RandomStepAssignment();
-                    o.LimitPosition();
-                    if (o.IsAlive)
-                    {
-                        Console.SetCursorPosition(o.X, o.Y);
-                        Console.Write(o.Text);
-                    }
+                    Move(o.Position, random);
+
+                    if (o.Render.Eneble)
+                        o.Render.Render();
                 }
             }
         }
+
+        public static void Move(Position position, Random random)
+        {
+            position.X += random.Next(-1, 1);
+            position.Y += random.Next(-1, 1);
+
+            if (position.X < 0)
+                position.X = 0;
+            if (position.Y < 0)
+                position.Y = 0;
+        }
     }
 
-    class MoveableObject
+    static class PositionExtensions
     {
-        public int X { get; private set; }
-        public int Y { get; private set; }
-        public bool IsAlive { get; private set; }
-        public string Text { get; private set; }
-
-        private Random _random;
-
-        public MoveableObject(int x, int y, Random random, string text, bool isAlive = true)
+        public static bool IntersectPosition(this Position position1, Position position2)
         {
-            X = x;
-            Y = y;
-            _random = random;
-            IsAlive = isAlive;
-            Text = text;
-        }
-
-        public bool EqualsPosition(MoveableObject position)
-        {
-            if (position.X == X && position.Y == Y)
+            if (position1.X == position2.X && position1.Y == position2.Y)
                 return true;
             else
                 return false;
         }
+    }
 
-        public void Die()
+    class GameObject
+    {
+        public Position Position { get; }
+        public Renderer Render { get; }
+
+        public GameObject(Position position, Renderer render)
         {
-            IsAlive = false;
+            Position = position;
+            Render = render;
+            Position.SetGameObject(this);
+            Render.SetGameObject(this);
+        }
+    }
+
+    class Position
+    {
+        public int X;
+        public int Y;
+
+        public GameObject _gameObject;
+
+        public Position(int x, int y)
+        {
+            X = x;
+            Y = y;
         }
 
-        public void RandomStepAssignment()
+        internal void SetGameObject(GameObject gameObject)
         {
-            X += _random.Next(-1, 1);
-            Y += _random.Next(-1, 1);
+            if (gameObject != null && gameObject.Position.Equals(this))
+                _gameObject = gameObject;
+        }
+    }
+
+    class Renderer
+    {
+        public bool Eneble;
+        public string Text;
+
+        private GameObject _gameObject;
+
+        public Renderer(bool eneble, string text)
+        {
+            Eneble = eneble;
+            Text = text;
         }
 
-        public void LimitPosition()
+        public void Render()
         {
-            if (X < 0)
-                X = 0;
-            if (Y < 0)
-                Y = 0;
+            Console.SetCursorPosition(_gameObject.Position.X, _gameObject.Position.Y);
+            Console.Write(Text);
+        }
+
+        internal void SetGameObject(GameObject gameObject)
+        {
+            if (gameObject != null && gameObject.Render.Equals(this))
+                _gameObject = gameObject;
         }
     }
 }
