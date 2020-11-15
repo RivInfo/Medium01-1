@@ -18,18 +18,23 @@ namespace Task
             while (true)
             {
                 if (objs.Length >= 2)
+                {
                     for (int i = 0; i < objs.Length - 1; i++)
+                    {
                         for (int j = i + 1; j < objs.Length; j++)
-                            if (objs[i].Position.IntersectPosition(objs[j].Position))
+                        {
+                            if (Position.IntersectPosition(objs[i].Position, objs[j].Position))
                             {
                                 objs[i].Render.Eneble = false;
                                 objs[j].Render.Eneble = false;
                             }
+                        }
+                    }
+                }
 
                 foreach (var o in objs)
                 {
                     Move(o.Position, random);
-
                     if (o.Render.Eneble)
                         o.Render.Render();
                 }
@@ -45,17 +50,6 @@ namespace Task
                 position.X = 0;
             if (position.Y < 0)
                 position.Y = 0;
-        }
-    }
-
-    static class PositionExtensions
-    {
-        public static bool IntersectPosition(this Position position1, Position position2)
-        {
-            if (position1.X == position2.X && position1.Y == position2.Y)
-                return true;
-            else
-                return false;
         }
     }
 
@@ -86,6 +80,14 @@ namespace Task
             Y = y;
         }
 
+        public static bool IntersectPosition(Position position1, Position position2)
+        {
+            if (position1.X == position2.X && position1.Y == position2.Y)
+                return true;
+            else
+                return false;
+        }
+
         internal void SetGameObject(GameObject gameObject)
         {
             if (gameObject != null && gameObject.Position.Equals(this))
@@ -96,7 +98,7 @@ namespace Task
     class Renderer
     {
         public bool Eneble;
-        public string Text;
+        public string Text { get; private set; }
 
         private GameObject _gameObject;
 
