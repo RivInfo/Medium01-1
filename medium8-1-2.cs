@@ -25,8 +25,8 @@ namespace Task
                         {
                             if (Position.IntersectPosition(objs[i].Position, objs[j].Position))
                             {
-                                objs[i].Render.Eneble = false;
-                                objs[j].Render.Eneble = false;
+                                objs[i].SetRenderEneble(false);
+                                objs[j].SetRenderEneble(false);
                             }
                         }
                     }
@@ -34,45 +34,54 @@ namespace Task
 
                 foreach (var o in objs)
                 {
-                    Move(o.Position, random);
+                    Move(o, random);
                     if (o.Render.Eneble)
                         o.Render.Render();
                 }
             }
         }
 
-        public static void Move(Position position, Random random)
+        public static void Move(GameObject go, Random random)
         {
-            position.X += random.Next(-1, 1);
-            position.Y += random.Next(-1, 1);
+            int _x = go.Position.X + random.Next(-1, 1);
+            int _y = go.Position.Y + random.Next(-1, 1);
 
-            if (position.X < 0)
-                position.X = 0;
-            if (position.Y < 0)
-                position.Y = 0;
+            if (_x < 0)
+                _x = 0;
+            if (_y < 0)
+                _y = 0;
+            go.Translate(_x, _y);
         }
     }
 
     class GameObject
     {
-        public Position Position { get; }
+        public Position Position { get; private set; }
         public Renderer Render { get; }
 
         public GameObject(Position position, Renderer render)
         {
             Position = position;
             Render = render;
-            Position.SetGameObject(this);
-            Render.SetGameObject(this);
+            Render.SetPosition(position);
+        }
+
+        public void SetRenderEneble(bool eneble)
+        {
+            Render.Eneble = eneble;
+        }
+
+        public void Translate(int x, int y)
+        {
+            Position = new Position(x, y);
+            Render.SetPosition(Position);
         }
     }
 
-    class Position
+    struct Position
     {
         public int X;
         public int Y;
-
-        public GameObject _gameObject;
 
         public Position(int x, int y)
         {
@@ -87,37 +96,30 @@ namespace Task
             else
                 return false;
         }
-
-        internal void SetGameObject(GameObject gameObject)
-        {
-            if (gameObject != null && gameObject.Position.Equals(this))
-                _gameObject = gameObject;
-        }
     }
 
     class Renderer
     {
         public bool Eneble;
-        public string Text { get; private set; }
+        public string RenderObject { get; private set; }
 
-        private GameObject _gameObject;
+        private Position _position;
 
         public Renderer(bool eneble, string text)
         {
             Eneble = eneble;
-            Text = text;
+            RenderObject = text;
         }
 
         public void Render()
         {
-            Console.SetCursorPosition(_gameObject.Position.X, _gameObject.Position.Y);
-            Console.Write(Text);
+            Console.SetCursorPosition(_position.X, _position.Y);
+            Console.Write(RenderObject);
         }
 
-        internal void SetGameObject(GameObject gameObject)
+        internal void SetPosition(Position position)
         {
-            if (gameObject != null && gameObject.Render.Equals(this))
-                _gameObject = gameObject;
+            _position = position;
         }
     }
 }
